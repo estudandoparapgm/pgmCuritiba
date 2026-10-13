@@ -1,0 +1,2385 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PGM · Organizada até passar 🍀</title>
+<style>
+  :root{--bg:#f4f5f7;--card:#fff;--ink:#1e232b;--mut:#6b7280;--line:#e5e7eb;--green:#15803d;--green2:#dcfce7;
+        --adm:#2563eb;--cons:#7c3aed;--trib:#b45309;--pproc:#0f766e;--urb:#16a34a;--trab:#ea580c;
+        --prev:#db2777;--pen:#dc2626;--emp:#4f46e5;--civil:#64748b;--review:#9ca3af;}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+  header{position:sticky;top:0;z-index:9;background:var(--card);border-bottom:1px solid var(--line);padding:10px 16px;
+         display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+  h1{font-size:19px;margin:0}
+  h1 small{color:var(--mut);font-weight:500;font-size:12px;display:block}
+  .pwrap{min-width:240px;flex:1;max-width:420px}
+  .bar{height:10px;background:#e9ecef;border-radius:99px;overflow:hidden}
+  .bar i{display:block;height:100%;background:var(--green);width:0;transition:width .25s}
+  .pmeta{display:flex;justify-content:space-between;font-size:12px;color:var(--mut);margin-top:3px}
+  .cd{font-size:13px;background:var(--green2);color:var(--green);padding:4px 10px;border-radius:99px;font-weight:600;white-space:nowrap}
+  .tools{display:flex;gap:6px}
+  .tools button{border:1px solid var(--line);background:#fff;border-radius:8px;padding:5px 10px;font-size:12px;cursor:pointer;color:var(--mut)}
+  .tools button:hover{color:var(--ink)}
+  .mile{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;padding:10px 16px 0;font-size:12.5px}
+  .mile span{background:#fff;border:1px solid var(--line);border-radius:99px;padding:3px 12px}
+  main{max-width:1180px;margin:0 auto;padding:16px 16px 60px}
+  .week{margin:26px 0 8px;display:flex;align-items:center;gap:10px}
+  .week h2{font-size:15px;margin:0;white-space:nowrap}
+  .week .wbar{flex:1;height:6px;background:#e9ecef;border-radius:99px;overflow:hidden;max-width:260px}
+  .week .wbar i{display:block;height:100%;background:var(--green);width:0}
+  .week small{color:var(--mut);font-size:12px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px}
+  .day{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:10px}
+  .day.today{outline:2px solid var(--green)}
+  .day.done{background:#f4fbf5;border-color:#bbf7d0}
+  .dhead{display:flex;justify-content:space-between;align-items:baseline;gap:6px}
+  .dhead b{font-size:15px}
+  .dhead .tt{font-size:10.5px;background:var(--green);color:#fff;border-radius:99px;padding:2px 8px;font-weight:700}
+  .blk{border-left:3px solid var(--mut);padding-left:9px}
+  .subj{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.4px;margin-bottom:2px}
+  .blk ul{margin:2px 0 4px;padding-left:17px}
+  .blk li{font-size:12.3px;color:#374151;margin:1.5px 0}
+  .blk li::marker{color:#c2c8d0}
+  .rev{font-size:12.5px;color:var(--mut);font-style:italic}
+  details summary{cursor:pointer;font-size:13.4px;font-weight:600;list-style:none}
+  details summary::before{content:"▸ ";color:var(--mut)}
+  details[open] summary::before{content:"▾ "}
+  .chk{display:flex;gap:6px;margin-top:2px;padding-top:9px;border-top:1px dashed var(--line)}
+  .chk button{flex:1;border:1px solid var(--line);background:#fafafa;border-radius:9px;padding:5px 2px;font-size:11.5px;cursor:pointer;color:var(--mut);transition:.12s}
+  .chk button:hover{border-color:var(--green);color:var(--green)}
+  .chk button.on{background:var(--green);border-color:var(--green);color:#fff;font-weight:700}
+  footer{text-align:center;color:var(--mut);font-size:12px;padding:20px}
+  .fin{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-top:18px;text-align:center}
+  .fin b{font-size:16px}
+  @media print{header,.tools,.mile{position:static} .chk button{display:none}.day{break-inside:avoid}body{background:#fff}}
+</style>
+</head>
+<body>
+<header>
+  <h1>🍀 PGM · Organizada até passar
+    <small>Prefeitura de Curitiba · Procurador do Município · FAFIPA · seg–sex, 12/10 → 11/12</small>
+  </h1>
+  <div class="pwrap">
+    <div class="bar"><i id="pbar"></i></div>
+    <div class="pmeta"><span id="ptxt">0 de 0 check-ins</span><span id="pdays"></span></div>
+  </div>
+  <div style="display:flex;gap:8px;align-items:center">
+    <span class="cd" id="countdown">—</span>
+    <div class="tools">
+      <button onclick="toggleAll(true)">expandir</button>
+      <button onclick="toggleAll(false)">recolher</button>
+      <button onclick="exportar()" title="baixar progresso em JSON — use para levar a outro navegador/dispositivo">⬇ exportar progresso</button>
+      <button onclick="document.getElementById('impf').click()" title="restaurar progresso de um JSON exportado">⬆ importar</button>
+      <button onclick="resetAll()" title="apagar progresso salvo">reset</button>
+      <input type="file" id="impf" accept=".json,application/json" style="display:none">
+    </div>
+  </div>
+</header>
+
+<div class="mile">
+  <span>📝 Inscrição: <b>até 05/11</b> (taxa até 06/11)</span>
+  <span>📍 Local de prova: 03/12</span>
+  <span>🎯 <b>Prova Objetiva: 13/12/2026</b> · 5h · 100 questões · aprovação ≥ 60</span>
+  <span>✍️ Discursiva: 24/02/2027</span>
+</div>
+
+<main id="app"></main>
+
+<footer>Cronograma gerado do Anexo II do Edital Normativo nº 6/2026 · progresso salvo automaticamente neste navegador (localStorage)</footer>
+
+<script>
+window.PGM_DATA={
+ "exam": "2026-12-13",
+ "disc": "2027-02-24",
+ "inscricao": "2026-11-05",
+ "subjects": {
+  "adm": {
+   "label": "Direito Administrativo",
+   "emoji": "🏛️"
+  },
+  "cons": {
+   "label": "Direito Constitucional",
+   "emoji": "⚖️"
+  },
+  "trib": {
+   "label": "Dir. Tributário, Proc. Tributário e Dir. Financeiro",
+   "emoji": "💰"
+  },
+  "pproc": {
+   "label": "Direito Processual Civil",
+   "emoji": "📜"
+  },
+  "urb": {
+   "label": "Direito Urbanístico e Ambiental",
+   "emoji": "🌳"
+  },
+  "trab": {
+   "label": "Dir. do Trabalho e Processual do Trabalho",
+   "emoji": "👷"
+  },
+  "prev": {
+   "label": "Direito Previdenciário",
+   "emoji": "🧓"
+  },
+  "pen": {
+   "label": "Dir. Penal e Processual Penal",
+   "emoji": "🚨"
+  },
+  "emp": {
+   "label": "Direito Empresarial",
+   "emoji": "🏢"
+  },
+  "civil": {
+   "label": "Direito Civil (foco discursiva)",
+   "emoji": "📄"
+  }
+ },
+ "days": [
+  {
+   "id": "2026-10-12",
+   "w": "Monday",
+   "d": 12,
+   "mo": "Oct",
+   "blocks": [
+    {
+     "subject": "adm",
+     "label": "Direito Administrativo",
+     "topics": [
+      {
+       "num": 1,
+       "title": "Teoria Geral e Princípios da Administração Pública",
+       "subs": [
+        "Objeto, fontes e regime jurídico-administrativo",
+        "Princípios expressos e implícitos da Administração Pública e a jurisprudência dos Tribunais Superiores",
+        "LINDB (Decreto-Lei nº 4.657/1942 e Lei nº 13.655/2018) aplicada ao Direito Público"
+       ]
+      }
+     ]
+    },
+    {
+     "subject": "cons",
+     "label": "Direito Constitucional",
+     "topics": [
+      {
+       "num": 1,
+       "title": "Teoria da Constituição e Hermenêutica",
+       "subs": [
+        "Conceito, classificação, aplicabilidade e eficácia das normas constitucionais",
+        "Disposições Constitucionais Transitórias",
+        "Supremacia da Constituição",
+        "Recepção, repristinação e desconstitucionalização",
+        "Hermenêutica e interpretação constitucional",
+        "Constitucionalismo e Neoconstitucionalismo. Mutação constitucional"
+       ]
+      }
+     ]
+    },
+    {
+     "subject": "urb",
+     "label": "Direito Urbanístico e Ambiental",
+     "topics": [
+      {
+       "num": 1,
+       "title": "Teoria Geral e Fundamentos",
+       "subs": [
+        "Conceito, objeto, autonomia e princípios do Direito Urbanístico",
+        "Função social da cidade e da propriedade urbana",
+        "Direito à cidade e direito à moradia"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "2026-10-13",
+   "w": "Tuesday",
+   "d": 13,
+   "mo": "Oct",
+   "blocks": [
+    {
+     "subject": "trib",
+     "label": "Dir. Tributário, Proc. Tributário e Dir. Financeiro",
+     "topics": [
+      {
+       "num": 1,
+       "title": "Sistema Tributário Nacional e Direito Tributário",
+       "subs": [
+        "conceito, autonomia, fontes e princípios do Direito Tributário",
+        "Sistema Tributário Nacional",
+        "Competência tributária: características, exercício, delegação e conflitos de competência",
+        "Limitações constitucionais ao poder de tributar",
+        "Princípios constitucionais tributários. Imunidades tributárias",
+        "Vigência, aplicação, interpretação e integração da legislação tributária",
+        "Normas gerais e normas complementares"
+       ]
+      }
+     ]
+    },
+    {
+     "subject": "pproc",
+     "label": "Direito Processual Civil",
+     "topics": [
+      {
+       "num": 1,
+       "title": "Teoria Geral do Processo e Normas Fundamentais",
+       "subs": [
+        "Princípios fundamentais do Processo Civil",
+        "Aplicação da norma processual no tempo e espaço"
+       ]
+      }
+     ]
+    },
+    {
+     "subject": "trab",
+     "label": "Dir. do Trabalho e Processual do Trabalho",
+     "topics": [
+      {
+       "num": 1,
+       "title": "Direito do Trabalho",
+       "subs": [
+        "Princípios e fontes",
+        "Proteção constitucional ao trabalho e relação de trabalho e emprego"
+       ]
+      },
+      {
+       "num": 2,
+       "title": "Regimes funcionais",
+       "subs": [
+        "estatutário, celetista e contratação temporária no setor público"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "2026-10-14",
+   "w": "Wednesday",
+   "d": 14,
+   "mo": "Oct",
+   "blocks": [
+    {
+     "subject": "adm",
+     "label": "Direito Administrativo",
+     "topics": [
+      {
+       "num": 2,
+       "title": "Organização Administrativa",
+       "subs": [
+        "Administração Direta e Indireta",
+        "Autarquias, Fundações Públicas, Empresas Públicas, Sociedades de Economia Mista e Agências Reguladoras",
+        "Consórcios Públicos (Lei nº 11.107/2005) e Convênios de Cooperação entre entes federados",
+        "Terceiro Setor: Serviços Sociais Autônomos (Sistema S), Organizações Sociais (OS), Organizações da Sociedade Civil de Interesse Público (OSCIP), Organizações da Sociedade Civil (OSCs) e Parcerias da Lei nº 13.019/2014",
+        "Lei Ordinária Municipal nº 7.671/1991 e suas alterações legislativas posteriores. Lei Municipal nº 9.226/1997 (que criou o Programa Municipal de Publicização) e Decreto Municipal nº 1.192/2017"
+       ]
+      }
+     ]
+    },
+    {
+     "subject": "cons",
+     "label": "Direito Constitucional",
+     "topics": [
+      {
+       "num": 2,
+       "title": "Poder Constituinte",
+       "subs": [
+        "Originário, derivado (reformador, revisor e decorrente)",
+        "Limitações formais, materiais, circunstanciais e temporais à reforma constitucional. Princípios Fundamentais"
+       ]
+      }
+     ]
+    },
+    {
+     "subject": "prev",
+     "label": "Direito Previdenciário",
+     "topics": [
+      {
+       "num": 1,
+       "title": "Seguridade Social e Regime Geral",
+       "subs": [
+        "Seguridade Social na CF/88: saúde, assistência social e previdência social. Princípios e diretrizes"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "2026-10-15",
+   "w": "Thursday",
+   "d": 15,
+   "mo": "Oct",
+   "blocks": [
+    {
+     "subject": "trib",
+     "label": "Dir. Tributário, Proc. Tributário e Dir. Financeiro",
+     "topics": [
+      {
+       "num": 2,
+       "title": "Tributos e Regra-Matriz de Incidência Tributária",
+       "subs": [
+        "conceito, natureza jurídica, classificação, espécies e funções dos tributos",
+        "Impostos, taxas, contribuição de melhoria, empréstimos compulsórios e contribuições especiais",
+        "Norma jurídica tributária",
+        "Regra-matriz de incidência",
+        "Hipótese de incidência, fato gerador, critérios material, temporal e espacial; critérios pessoal e quantitativo da consequência tributária"
+       ]
+      }
+     ]
+    },
+    {
+     "subject": "pproc",
+     "label": "Direito Processual Civil",
+     "topics": [
+      {
+       "num": 2,
+       "title": "Jurisdição, Competência e Ação",
+       "subs": [
+        "Limites da jurisdição nacional e cooperação internacional",
+        "Competência absoluta e relativa, modificação de competência e conexões",
+        "Competência nas ações em que o Município é parte ou interessado"
+       ]
+      }
+     ]
+    },
+    {
+     "subject": "emp",
+     "label": "Direito Empresarial",
+     "topics": [
+      {
+       "num": 1,
+       "title": "Fundamentos do direito empresarial.",
+       "subs": [
+        "Origem e evolução histórica, autonomia, fontes e características.Teoria da empresa",
+        "Empresa, empresário individual e sociedade empresária",
+        "Capacidade, impedimentos, registro e obrigações do empresário",
+        "Estabelecimento empresarial: conceito, elementos, aviamento, nome empresarial e trespasse. Prepostos do empresário",
+        "Institutos complementares: nome empresarial, estabelecimento empresarial, escrituração"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "2026-10-16",
+   "w": "Friday",
+   "d": 16,
+   "mo": "Oct",
+   "blocks": [
+    {
+     "subject": "review",
+     "focus": "Direito Administrativo",
+     "label": "Reforço & questões — Direito Administrativo",
+     "topics": []
+    },
+    {
+     "subject": "trib",
+     "label": "Dir. Tributário, Proc. Tributário e Dir. Financeiro",
+     "topics": [
+      {
+       "num": 3,
+       "title": "Obrigação e Crédito Tributário",
+       "subs": [
+        "obrigação tributária principal e acessória",
+        "Sujeição ativa e passiva. Solidariedade",
+        "Capacidade e domicílio tributário",
+        "Responsabilidade tributária: sucessores, terceiros, infrações e substituição tributária. Denúncia espontânea. Crédito tributário",
+        "Lançamento e suas modalidades",
+        "Suspensão, extinção e exclusão do crédito tributário",
+        "Decadência e prescrição tributárias"
+       ]
+      }
+     ]
+    },
+    {
+     "subject": "civil",
+     "label": "Direito Civil (foco discursiva)",
+     "topics": [
+      {
+       "num": 1,
+       "title": "Parte Geral do Direito Civil",
+       "subs": [
+        "Pessoa natural e pessoa jurídica",
+        "Bens públicos e privados",
+        "Fato, ato e negócio jurídico: defeitos, invalidades e eficácia. Prescrição e decadência",
+        "Prescrição quinquenal (prescrição contra e a favor da Fazenda Pública - Decreto Federal nº 20.910/1932)"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "2026-10-19",
+   "w": "Monday",
+   "d": 19,
+   "mo": "Oct",
+   "blocks": [
+    {
+     "subject": "adm",
+     "label": "Direito Administrativo",
+     "topics": [
+      {
+       "num": 3,
+       "title": "Advocacia Pública",
+       "subs": [
+        "A responsabilidade civil e funcional do parecerista jurídico",
+        "Responsabilidade do administrador público nas hipóteses em que atua em conformidade ou em desconformidade com a orientação jurídica"
+       ]
+      }
+     ]
+    },
+    {
+     "subject": "review",
+     "focus": "Direito Constitucional",
+     "label": "Reforço & questões — Direito Constitucional",
+     "topics": []
+    },
+    {
+     "subject": "urb",
+     "label": "Direito Urbanístico e Ambiental",
+     "topics": [
+      {
+       "num": 2,
+       "title": "Ordem Urbanística Constitucional, Estatuto da Metrópole e Estatuto da Cidade",
+       "subs": [
+        "Estatuto da Metrópole (Lei Federal nº 13.089/2015)",
+        "Estatuto da Cidade (Lei Federal nº 10.257/2001): diretrizes gerais, gestão democrática, Plano Diretor e instrumentos de política urbana (outorga onerosa, transferência do direito de construir, Parcelamento, Edificação ou Utilização Compulsórios (PEUC), IPTU progressivo no tempo, desapropriação-sanção, consórcio imobiliário e direito de preempção)",
+        "Direito de superfície",
+        "Operações urbanas consorciadas",
+        "Zonas Especiais de Interesse Social (ZEIS)",
+        "Estudo de Impacto de Vizinhança (EIV)"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "2026-10-20",
+   "w": "Tuesday",
+   "d": 20,
+   "mo": "Oct",
+   "blocks": [
+    {
+     "subject": "review",
+     "focus": "Dir. Tributário, Proc. Tributário e Dir. Financeiro",
+     "label": "Reforço & questões — Dir. Tributário, Proc. Tributário e Dir. Financeiro",
+     "topics": []
+    },
+    {
+     "subject": "pproc",
+     "label": "Direito Processual Civil",
+     "topics": [
+      {
+       "num": 3,
+       "title": "Sujeitos do Processo e Intervenção de Terceiros",
+       "subs": [
+        "Capacidade processual, litisconsórcio e modalidades de intervenção de terceiros",
+        "Desconsideração da personalidade jurídica",
+        "Prerrogativas e atuação da Fazenda Pública em Juízo (Prazos, intimação pessoal, remessa necessária e execução diferenciada)"
+       ]
+      }
+     ]
+    },
+    {
+     "subject": "trab",
+     "label": "Dir. do Trabalho e Processual do Trabalho",
+     "topics": [
+      {
+       "num": 3,
+       "title": "Contrato de Trabalho e Administração Pública",
+       "subs": [
+        "Contrato de trabalho com o Ente Público e exigência de concurso público",
+        "Terceirização de serviços e responsabilidade da Administração Pública",
+        "Terceirização e responsabilidade subsidiária da Administração Pública à luz dos precedentes vinculantes e qualificados dos Tribunais Superiores. Contratação nula"
+       ]
+      },
+      {
+       "num": 4,
+       "title": "Condições de Trabalho e Rescisão",
+       "subs": [
+        "Duração do trabalho, jornada, horas extras e intervalos, férias",
+        "Salário, remuneração e equiparação salarial",
+        "Segurança e saúde no trabalho (insalubridade e periculosidade)",
+        "Extinção do contrato de trabalho",
+        "Estabilidade e garantia no emprego"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "2026-10-21",
+   "w": "Wednesday",
+   "d": 21,
+   "mo": "Oct",
+   "blocks": [
+    {
+     "subject": "adm",
+     "label": "Direito Administrativo",
+     "topics": [
+      {
+       "num": 4,
+       "title": "Atos e Processo Administrativo",
+       "subs": [
+        "Conceito, requisitos, atributos, classificação e espécies de atos administrativos",
+        "Vinculação e discricionariedade",
+        "Teoria dos Motivos Determinantes",
+        "Invalidação: revogação, anulação, cassação e convalidação",
+        "Processo Administrativo em geral. Lei de Processo administrativo federal e Lei de Processo Administrativo municipal (Lei nº 16.466/2024) e Decreto nº 435/2026",
+        "Prescrição da pretensão punitiva e executória",
+        "Prescrição intercorrente",
+        "Marcos interruptivos da prescrição"
+       ]
+      }
+     ]
+    },
+    {
+     "subject": "cons",
+     "label": "Direito Constitucional",
+     "topics": [
+      {
+       "num": 3,
+       "title": "Controle de Constitucionalidade",
+       "subs": [
+        "Sistema brasileiro de controle de constitucionalidade",
+        "Controle difuso e concentrado",
+        "Ação Direta de Inconstitucionalidade (ADI), Ação Declaratória de Constitucionalidade (ADC), Ação Direta de Inconstitucionalidade por Omissão (ADO) e Arguição de Descumprimento de Preceito Fundamental (ADPF)",
+        "Controle de constitucionalidade estadual: representação de inconstitucionalidade de lei ou ato normativo estadual ou municipal em face da Constituição do Estado do Paraná",
+        "Modulação de efeitos, técnicas de decisão e Súmulas Vinculantes"
+       ]
+      }
+     ]
+    },
+    {
+     "subject": "prev",
+     "label": "Direito Previdenciário",
+     "topics": [
+      {
+       "num": 2,
+       "title": "Regime Geral de Previdência Social - RGPS (Leis Nacionais nº 8.212/1991 e nº 8.213/1991)",
+       "subs": [
+        "segurados, filiação, custeio e benefícios em espécie"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "2026-10-22",
+   "w": "Thursday",
+   "d": 22,
+   "mo": "Oct",
+   "blocks": [
+    {
+     "subject": "trib",
+     "label": "Dir. Tributário, Proc. Tributário e Dir. Financeiro",
+     "topics": [
+      {
+       "num": 4,
+       "title": "Reforma Tributária do Consumo",
+       "subs": [
+        "Emenda Constitucional nº 132/2023",
+        "Imposto sobre Bens e Serviços – IBS, Contribuição sobre Bens e Serviços – CBS e Imposto Seletivo – IS",
+        "Princípio do destino, neutralidade, não cumulatividade, creditamento, regimes diferenciados e específicos e regras de transição",
+        "Transição do ISSQN e do ICMS para o IBS. Lei Complementar Federal nº 214/2025 e Lei Complementar Federal nº 227/2026",
+        "Comitê Gestor do IBS – CGIBS: natureza, estrutura, competências, fiscalização, cobrança, processo administrativo tributário e distribuição do produto da arrecadação aos entes federativos"
+       ]
+      }
+     ]
+    },
+    {
+     "subject": "review",
+     "focus": "Direito Processual Civil",
+     "label": "Reforço & questões — Direito Processual Civil",
+     "topics": []
+    },
+    {
+     "subject": "pen",
+     "label": "Dir. Penal e Processual Penal",
+     "topics": [
+      {
+       "num": 1,
+       "title": "Código Penal Brasileiro (atualizado).",
+       "subs": [
+        "Princípios e aplicação da lei penal. Teoria do crime",
+        "Fato típico, ilicitude e culpabilidade. Concurso de pessoas. Concurso de crimes. Teoria da pena",
+        "Extinção da punibilidade. Prescrição",
+        "Crimes de abuso de autoridade",
+        "Crimes previstos em legislação penal especial",
+        "Princípios e normas fundamentais do processo penal",
+        "Aplicação da lei processual penal",
+        "Investigação criminal e inquérito policial. Ação penal. Competência. Sujeitos processuais",
+        "Provas e cadeia de custódia",
+        "Prisões e medidas cautelares. Liberdade provisória. Procedimentos penais"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "2026-10-23",
+   "w": "Friday",
+   "d": 23,
+   "mo": "Oct",
+   "blocks": [
+    {
+     "subject": "review",
+     "focus": "Direito Administrativo",
+     "label": "Reforço & questões — Direito Administrativo",
+     "topics": []
+    },
+    {
+     "subject": "pproc",
+     "label": "Direito Processual Civil",
+     "topics": [
+      {
+       "num": 4,
+       "title": "Atos Processuais e Tutela Provisória",
+       "subs": [
+        "Forma, tempo, lugar e prazos dos atos processuais",
+        "Tutela provisória: tutela de urgência (cautelar e antecipada) e tutela de evidência contra e a favor da Fazenda Pública. Teoria das nulidades"
+       ]
+      }
+     ]
+    },
+    {
+     "subject": "civil",
+     "label": "Direito Civil (foco discursiva)",
+     "topics": [
+      {
+       "num": 2,
+       "title": "Obrigações e Contratos",
+       "subs": [
+        "Teoria geral das obrigações, modalidades, adimplemento e inadimplemento",
+        "Teoria geral dos contratos, princípios contratuais, boa-fé objetiva e função social",
+        "Espécies contratuais no Código Civil (compra e venda, doação, mandato, fiança e transação). Atos unilaterais"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "2026-10-26",
+   "w": "Monday",
+   "d": 26,
+   "mo": "Oct",
+   "blocks": [
+    {
+     "subject": "adm",
+     "label": "Direito Administrativo",
+     "topics": [
+      {
+       "num": 5,
+       "title": "Direito Administrativo Sancionador",
+       "subs": [
+        "princípios e garantias aplicáveis ao exercício do poder sancionador da Administração Pública",
+        "Legalidade, tipicidade, culpabilidade, proporcionalidade, dosimetria, prescrição, non bis in idem, motivação e consensualidade"
+       ]
+      }
+     ]
+    },
+    {
+     "subject": "cons",
+     "label": "Direito Constitucional",
+     "topics": [
+      {
+       "num": 4,
+       "title": "Direitos e Garantias Fundamentais",
+       "subs": [
+        "Direitos individuais, coletivos e sociais e seus mecanismos de efetivação",
+        "Princípios da legalidade e da isonomia",
+        "Reserva do possível, mínimo existencial e proibição do retrocesso social",
+        "Garantias constitucionais: Habeas Corpus, Mandado de Segurança (individual e coletivo), Mandado de Injunção, Habeas Data, Ação Popular e Ação Civil Pública",
+        "Estatuto da Pessoa com Deficiência (Lei Federal nº 13.146/2015) e Estatuto do Idoso (Lei Federal nº 10.741/2003)"
+       ]
+      }
+     ]
+    },
+    {
+     "subject": "urb",
+     "label": "Direito Urbanístico e Ambiental",
+     "topics": [
+      {
+       "num": 3,
+       "title": "Legislação Urbanística do Município de Curitiba",
+       "subs": [
+        "Revisão do Plano Diretor de Curitiba (Lei Municipal nº 14.771/2015); Zoneamento, Uso e Ocupação do Solo (Lei Municipal nº 15.511/2019, Lei Municipal nº 15.626/2020, Lei Municipal nº 16.361/2024, Lei Municipal nº 16.448/2024 e normas supervenientes); Código de Posturas do Município (Lei Municipal nº 11.095/2004); Regulação da concessão de potencial construtivo adicional em Curitiba (Lei Municipal nº 16.361/2024); Proteção do Patrimônio Cultural de Curitiba (Lei Municipal nº 14.794/2016)"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "2026-10-27",
+   "w": "Tuesday",
+   "d": 27,
+   "mo": "Oct",
+   "blocks": [
+    {
+     "subject": "trib",
+     "label": "Dir. Tributário, Proc. Tributário e Dir. Financeiro",
+     "topics": [
+      {
+       "num": 5,
+       "title": "IPTU",
+       "subs": [
+        "regra-matriz de incidência",
+        "Sujeitos ativo e passivo. Imunidades e isenções. Base de cálculo",
+        "Planta Genérica de Valores",
+        "Alíquotas e progressividade fiscal e extrafiscal. Lançamento. Lei Complementar Municipal nº 40/2001 e alterações"
+       ]
+      }
+     ]
+    },
+    {
+     "subject": "pproc",
+     "label": "Direito Processual Civil",
+     "topics": [
+      {
+       "num": 5,
+       "title": "Procedimento Comum e Provas",
+       "subs": [
+        "Petição inicial, contestação, reconvenção e revelia",
+        "Teoria geral da prova, ônus da prova e provas em espécie",
+        "Sentença, coisa julgada e motivação das decisões"
+       ]
+      }
+     ]
+    },
+    {
+     "subject": "trab",
+     "label": "Dir. do Trabalho e Processual do Trabalho",
+     "topics": [
+      {
+       "num": 5,
+       "title": "Negociação coletiva. Acordos e convenções coletivas de trabalho",
+       "subs": [
+        "conceito, validade e eficácia",
+        "Cláusulas obrigatórias e facultativas",
+        "Conflitos entre normas coletivas e individuais"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "2026-10-28",
+   "w": "Wednesday",
+   "d": 28,
+   "mo": "Oct",
+   "blocks": [
+    {
+     "subject": "adm",
+     "label": "Direito Administrativo",
+     "topics": [
+      {
+       "num": 6,
+       "title": "Compromisso de Ajustamento de Conduta e Autocomposição na Administração Municipal de Curitiba",
+       "subs": [
+        "Lei Ordinária Municipal nº 15.461/2019, Lei Complementar Municipal nº 141/2023, Decreto Municipal nº 868/2024 e Decreto Municipal nº 1.106/2024"
+       ]
+      }
+     ]
+    },
+    {
+     "subject": "review",
+     "focus": "Direito Constitucional",
+     "label": "Reforço & questões — Direito Constitucional",
+     "topics": []
+    },
+    {
+     "subject": "prev",
+     "label": "Direito Previdenciário",
+     "topics": [
+      {
+       "num": 3,
+       "title": "Regimes Próprios de Previdência Social (RPPS)",
+       "subs": [
+        "Disciplina constitucional do RPPS e reformas constitucionais (ECs nº 20/1998, nº 41/2003, nº 47/2005, nº 70/2012 e EC nº 103/2019)",
+        "Normas gerais dos RPPS (Lei Federal nº 9.717/1998 e Lei Federal nº 10.887/2004)",
+        "Diretrizes do RPPS: contributividade, solidariedade, equilíbrio financeiro e atuarial, vedação de contagem de tempo fictício, contagem recíproca e compensação financeira entre regimes",
+        "Regras de transição decorrentes da Emenda Constitucional nº 103/2019 e sua aplicação aos regimes próprios"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "2026-10-29",
+   "w": "Thursday",
+   "d": 29,
+   "mo": "Oct",
+   "blocks": [
+    {
+     "subject": "review",
+     "focus": "Dir. Tributário, Proc. Tributário e Dir. Financeiro",
+     "label": "Reforço & questões — Dir. Tributário, Proc. Tributário e Dir. Financeiro",
+     "topics": []
+    },
+    {
+     "subject": "review",
+     "focus": "Direito Processual Civil",
+     "label": "Reforço & questões — Direito Processual Civil",
+     "topics": []
+    },
+    {
+     "subject": "emp",
+     "label": "Direito Empresarial",
+     "topics": [
+      {
+       "num": 2,
+       "title": "Sociedades",
+       "subs": [
+        "disposições gerais, personalidade jurídica, desconsideração da personalidade jurídica, desconsideração inversa, sociedades não personificadas e personificadas. Sociedade simples. Sociedade limitada",
+        "Sociedade anônima e companhia (Lei Federal nº 6.404/1976): constituição, capital social, ações, administração, controle, responsabilidade dos administradores, transformação, incorporação, fusão e cisão",
+        "Grupos societários e consórcios",
+        "Sociedades de economia mista e empresas públicas, inclusive quanto às peculiaridades decorrentes da participação estatal",
+        "Regime Jurídico dos sócios"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "2026-10-30",
+   "w": "Friday",
+   "d": 30,
+   "mo": "Oct",
+   "blocks": [
+    {
+     "subject": "review",
+     "focus": "Direito Administrativo",
+     "label": "Reforço & questões — Direito Administrativo",
+     "topics": []
+    },
+    {
+     "subject": "trib",
+     "label": "Dir. Tributário, Proc. Tributário e Dir. Financeiro",
+     "topics": [
+      {
+       "num": 6,
+       "title": "ISSQN",
+       "subs": [
+        "Lei Complementar Federal nº 116/2003. Lei Complementar Municipal nº 40/2001 e alterações",
+        "Regra-matriz de incidência. Local da prestação",
+        "Sujeição ativa e passiva",
+        "Base de cálculo e alíquotas. Retenção na fonte",
+        "Responsabilidade tributária",
+        "Sociedades de profissionais e regimes especiais de tributação"
+       ]
+      }
+     ]
+    },
+    {
+     "subject": "civil",
+     "label": "Direito Civil (foco discursiva)",
+     "topics": [
+      {
+       "num": 3,
+       "title": "Responsabilidade Civil",
+       "subs": [
+        "Teorias da responsabilidade civil",
+        "Elementos da responsabilidade civil (conduta, nexo causal e dano)",
+        "Dano material, moral e estético",
+        "Responsabilidade civil objetiva e subjetiva"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "2026-11-02",
+   "w": "Monday",
+   "d": 2,
+   "mo": "Nov",
+   "blocks": [
+    {
+     "subject": "adm",
+     "label": "Direito Administrativo",
+     "topics": [
+      {
+       "num": 7,
+       "title": "Licitações e Contratos Administrativos",
+       "subs": [
+        "Lei Federal nº 14.133/2021 (Nova Lei de Licitações e Contratos Administrativos): princípios, modalidades, critérios de julgamento, contratação direta (inexigibilidade e dispensa), alienações e procedimentos auxiliares",
+        "Regime contratual: alteração, execução, inexecução, equilíbrio econômico- financeiro e extinção dos contratos. Lei das estatais (Lei nº 13.303/2016)",
+        "Contrato Público para Solução Inovadora – CPSI e contrato de fornecimento decorrente, nos termos da Lei Complementar Federal nº 182/2021"
+       ]
+      }
+     ]
+    },
+    {
+     "subject": "cons",
+     "label": "Direito Constitucional",
+     "topics": [
+      {
+       "num": 5,
+       "title": "Organização do Estado e Federação",
+       "subs": [
+        "Estado Federal, características, bens e repartição constitucional de competências (exclusiva, privativa, comum e concorrente)",
+        "Estado-membro: autonomia e competências",
+        "Constituição do Estado do Paraná",
+        "Autonomia dos Municípios e competências municipais. Lei Orgânica do Município de Curitiba (Lei nº 5.700/1977 e alterações)",
+        "Intervenção Federal e Estadual"
+       ]
+      }
+     ]
+    },
+    {
+     "subject": "urb",
+     "label": "Direito Urbanístico e Ambiental",
+     "topics": [
+      {
+       "num": 4,
+       "title": "Parcelamento e Ordenamento do Solo Urbano",
+       "subs": [
+        "Loteamento, desmembramento e arruamento. Lei Federal nº 6.766/1979 e alterações legislativas posteriores",
+        "Normas locais: Lei Municipal nº 2.942/1966 e Lei Municipal nº 9.460/1998 (Regularização do parcelamento do solo)",
+        "Alinhamento, recuo, afastamento e edificação"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "2026-11-03",
+   "w": "Tuesday",
+   "d": 3,
+   "mo": "Nov",
+   "blocks": [
+    {
+     "subject": "trib",
+     "label": "Dir. Tributário, Proc. Tributário e Dir. Financeiro",
+     "topics": [
+      {
+       "num": 7,
+       "title": "ITBI",
+       "subs": [
+        "regra-matriz de incidência",
+        "Hipóteses de incidência e não incidência. Imunidades. Sujeição passiva",
+        "Momento de ocorrência do fato gerador. Base de cálculo. Arbitramento. Lei Complementar Municipal nº 40/2001 e alterações"
+       ]
+      }
+     ]
+    },
+    {
+     "subject": "pproc",
+     "label": "Direito Processual Civil",
+     "topics": [
+      {
+       "num": 6,
+       "title": "Recursos e Processo nos Tribunais",
+       "subs": [
+        "Teoria geral dos recursos, apelação, agravo de instrumento, embargos de declaração, recurso especial e extraordinário",
+        "Incidente de Resolução de Demandas Repetitivas (IRDR), Incidente de Assunção de Competência (IAC) e Reclamação Constitucional. Sistema de precedentes. Ação rescisória. Coisa julgada. Remessa necessária"
+       ]
+      }
+     ]
+    },
+    {
+     "subject": "trab",
+     "label": "Dir. do Trabalho e Processual do Trabalho",
+     "topics": [
+      {
+       "num": 6,
+       "title": "Organização sindical.",
+       "subs": [
+        "Direito de greve no setor público"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "2026-11-04",
+   "w": "Wednesday",
+   "d": 4,
+   "mo": "Nov",
+   "blocks": [
+    {
+     "subject": "review",
+     "focus": "Direito Administrativo",
+     "label": "Reforço & questões — Direito Administrativo",
+     "topics": []
+    },
+    {
+     "subject": "cons",
+     "label": "Direito Constitucional",
+     "topics": [
+      {
+       "num": 6,
+       "title": "Organização dos Poderes",
+       "subs": [
+        "Separação de poderes e sistema de freios e contrapesos",
+        "Poder Legislativo: organização, atribuições, processo legislativo municipal, imunidades, comissões parlamentares, fiscalização financeira/orçamentária e Tribunal de Contas",
+        "Poder Executivo: organização, atribuições, poder regulamentar e responsabilidade",
+        "Poder Judiciário: organização, competências e Conselho Nacional de Justiça (CNJ)"
+       ]
+      }
+     ]
+    },
+    {
+     "subject": "prev",
+     "label": "Direito Previdenciário",
+     "topics": [
+      {
+       "num": 4,
+       "title": "Regime Previdenciário dos Servidores do Município de Curitiba",
+       "subs": [
+        "Custeio e Organização do RPPS do Município de Curitiba (IPMC): Leis Municipais nº 9.626/1999, nº 10.817/2003, nº 12.072/2006, nº 15.042/2017, nº 16.768/2026 e legislação alteradora/regulamentadora posterior"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "2026-11-05",
+   "w": "Thursday",
+   "d": 5,
+   "mo": "Nov",
+   "blocks": [
+    {
+     "subject": "review",
+     "focus": "Dir. Tributário, Proc. Tributário e Dir. Financeiro",
+     "label": "Reforço & questões — Dir. Tributário, Proc. Tributário e Dir. Financeiro",
+     "topics": []
+    },
+    {
+     "subject": "pproc",
+     "label": "Direito Processual Civil",
+     "topics": [
+      {
+       "num": 7,
+       "title": "Execução e Cumprimento de Sentença",
+       "subs": [
+        "Cumprimento de sentença contra a Fazenda Pública",
+        "Execução de títulos extrajudiciais. Defesas do executado",
+        "Impugnação ao cumprimento de sentença",
+        "Regime de pagamento de precatórios e RPV no Município de Curitiba (Lei Municipal nº 10.235/2001)"
+       ]
+      }
+     ]
+    },
+    {
+     "subject": "review",
+     "focus": "Dir. Penal e Processual Penal",
+     "label": "Reforço & questões — Dir. Penal e Processual Penal",
+     "topics": []
+    }
+   ]
+  },
+  {
+   "id": "2026-11-06",
+   "w": "Friday",
+   "d": 6,
+   "mo": "Nov",
+   "blocks": [
+    {
+     "subject": "adm",
+     "label": "Direito Administrativo",
+     "topics": [
+      {
+       "num": 8,
+       "title": "Regulamentação da Lei Federal nº 14.133/2021 no âmbito do Município de Curitiba",
+       "subs": [
+        "Decreto Municipal nº 1.883/2021, Decreto nº 700/2023, Decreto Municipal nº 701/2023, Decreto Municipal nº 384/2023, Decreto Municipal nº 383/2023, Decreto nº 2051/2025 e Decreto Municipal 2067/2025, Decreto Municipal nº 380/2023, Decreto Municipal nº 469/2023, Decreto Municipal nº 385/2023",
+        "Decreto Municipal nº 388/2025 e Decreto Municipal nº 1206/2023.Decreto Municipal nº 460/2023, Decreto Municipal nº 723/2023"
+       ]
+      }
+     ]
+    },
+    {
+     "subject": "review",
+     "focus": "Direito Processual Civil",
+     "label": "Reforço & questões — Direito Processual Civil",
+     "topics": []
+    },
+    {
+     "subject": "civil",
+     "label": "Direito Civil (foco discursiva)",
+     "topics": [
+      {
+       "num": 4,
+       "title": "Direitos Reais",
+       "subs": [
+        "Posse e Propriedade",
+        "Aquisição e perda da propriedade imóvel. Propriedade Resolúvel",
+        "Restrições ao direito de propriedade e vizinhança",
+        "Condomínio e Direitos Reais sobre coisa alheia"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "2026-11-09",
+   "w": "Monday",
+   "d": 9,
+   "mo": "Nov",
+   "blocks": [
+    {
+     "subject": "adm",
+     "label": "Direito Administrativo",
+     "topics": [
+      {
+       "num": 9,
+       "title": "Regulação de parcerias e delegações no Município de Curitiba",
+       "subs": [
+        "Lei Ordinária Municipal nº 16.538/2025 – Criação da empresa estatal PARS S/A; Lei Ordinária Municipal nº 16.763/2026 – Instituição do Programa Municipal de Parcerias Estratégicas (PMPE) de Curitiba; Decreto Municipal nº 1.067/2016 com as alterações dispostas no Decreto Municipal nº 352/2023 e no Decreto Municipal nº 2.046/2023; e Parcerias Público-Privadas (Lei Federal nº 11.079/2004 e alterações posteriores, Lei Ordinária Municipal nº 16.763/2026 e Decreto Municipal nº 610/2019)"
+       ]
+      }
+     ]
+    },
+    {
+     "subject": "review",
+     "focus": "Direito Constitucional",
+     "label": "Reforço & questões — Direito Constitucional",
+     "topics": []
+    },
+    {
+     "subject": "review",
+     "focus": "Direito Urbanístico e Ambiental",
+     "label": "Reforço & questões — Direito Urbanístico e Ambiental",
+     "topics": []
+    }
+   ]
+  },
+  {
+   "id": "2026-11-10",
+   "w": "Tuesday",
+   "d": 10,
+   "mo": "Nov",
+   "blocks": [
+    {
+     "subject": "trib",
+     "label": "Dir. Tributário, Proc. Tributário e Dir. Financeiro",
+     "topics": [
+      {
+       "num": 8,
+       "title": "Taxas, Contribuição de Melhoria e COSIP",
+       "subs": [
+        "taxas decorrentes do exercício do poder de polícia e da prestação de serviços públicos",
+        "Contribuição de melhoria",
+        "Contribuição para o custeio, expansão e melhoria do serviço de iluminação pública e de sistemas de monitoramento para segurança e preservação de logradouros públicos, nos termos da Constituição e da legislação municipal",
+        "Regra-matriz, sujeito passivo, base de cálculo, lançamento e isenções"
+       ]
+      }
+     ]
+    },
+    {
+     "subject": "pproc",
+     "label": "Direito Processual Civil",
+     "topics": [
+      {
+       "num": 8,
+       "title": "Juizados Especiais e Métodos Consensuais",
+       "subs": [
+        "Juizado Especial Cível e Juizado especial da Fazenda Pública (Lei Federal nº 12.153/2009). Lei nº 13.140/2015",
+        "Conciliação, mediação e arbitragem envolvendo o Ente Público",
+        "Negócios jurídicos processuais, convenções processuais e calendário processual envolvendo a Fazenda Pública: cabimento e limites"
+       ]
+      }
+     ]
+    },
+    {
+     "subject": "trab",
+     "label": "Dir. do Trabalho e Processual do Trabalho",
+     "topics": [
+      {
+       "num": 7,
+       "title": "Direito Processual do Trabalho",
+       "subs": [
+        "Organização e competência da Justiça do Trabalho",
+        "Prerrogativas da Fazenda Pública na Justiça do Trabalho",
+        "Procedimentos, provas, audiências, sentença, recursos trabalhistas. Prescrição e decadência"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "2026-11-11",
+   "w": "Wednesday",
+   "d": 11,
+   "mo": "Nov",
+   "blocks": [
+    {
+     "subject": "review",
+     "focus": "Direito Administrativo",
+     "label": "Reforço & questões — Direito Administrativo",
+     "topics": []
+    },
+    {
+     "subject": "cons",
+     "label": "Direito Constitucional",
+     "topics": [
+      {
+       "num": 7,
+       "title": "Funções Essenciais à Justiça",
+       "subs": [
+        "Ministério Público, Advocacia e Advocacia-Geral da União",
+        "Advocacia Pública e Advocacia Pública Municipal",
+        "Procuradoria-Geral do Município de Curitiba: prerrogativas constitucionais, organização, atribuições e autonomia institucional",
+        "Lei Orgânica do Município de Curitiba (Lei nº 5.700/1977 e alterações); Lei Municipal nº 11.001/2004, que institui a carreira de Procurador do Município; Lei Municipal nº 11.875/2006, que cria novas atribuições da Procuradoria-Geral do Município e a Gratificação Especial de Procurador; e Lei Municipal nº 16.200/2023, que institui o Plano de Carreira dos Procuradores do Município"
+       ]
+      }
+     ]
+    },
+    {
+     "subject": "review",
+     "focus": "Direito Previdenciário",
+     "label": "Reforço & questões — Direito Previdenciário",
+     "topics": []
+    }
+   ]
+  },
+  {
+   "id": "2026-11-12",
+   "w": "Thursday",
+   "d": 12,
+   "mo": "Nov",
+   "blocks": [
+    {
+     "subject": "trib",
+     "label": "Dir. Tributário, Proc. Tributário e Dir. Financeiro",
+     "topics": [
+      {
+       "num": 9,
+       "title": "Administração Tributária",
+       "subs": [
+        "fiscalização tributária. Deveres instrumentais. Sigilo fiscal",
+        "Dívida ativa tributária e não tributária",
+        "Inscrição, requisitos e presunções da certidão de dívida ativa. Certidões tributárias",
+        "Garantias e privilégios do crédito tributário. Preferências. Concurso de credores",
+        "Fraude à execução fiscal"
+       ]
+      }
+     ]
+    },
+    {
+     "subject": "pproc",
+     "label": "Direito Processual Civil",
+     "topics": [
+      {
+       "num": 9,
+       "title": "Encargos Financeiros e Prescrição envolvendo a Fazenda Pública",
+       "subs": [
+        "Juros, atualização monetária e demais valores devidos pela Fazenda Pública no curso e em decorrência do processo judicial",
+        "Prescrição contra a Fazenda Pública e prescrição intercorrente. Decreto nº 20.910/1932 e Decreto-Lei nº 4.597/1942"
+       ]
+      }
+     ]
+    },
+    {
+     "subject": "emp",
+     "label": "Direito Empresarial",
+     "topics": [
+      {
+       "num": 3,
+       "title": "Defesa da concorrência e repressão ao abuso do poder econômico (Lei Federal nº 12.529/2011)",
+       "subs": [
+        "infrações à ordem econômica, atos de concentração e Conselho Administrativo de Defesa Econômica – CADE"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "2026-11-13",
+   "w": "Friday",
+   "d": 13,
+   "mo": "Nov",
+   "blocks": [
+    {
+     "subject": "adm",
+     "label": "Direito Administrativo",
+     "topics": [
+      {
+       "num": 10,
+       "title": "Bens e Serviços Públicos",
+       "subs": [
+        "Bens públicos: classificação, regime jurídico, afetação, desafetação e formas de alienação",
+        "Uso de bens públicos por particulares: autorização, permissão, concessão de uso e concessão de direito real de uso",
+        "Serviços públicos: conceito, princípios, prestação direta e indireta, regulação e direitos dos usuários",
+        "Código de Defesa do Consumidor (Lei Federal nº 8.078/1990) aplicado aos serviços públicos",
+        "Direitos dos usuários dos serviços públicos (Lei Federal nº 13.460/2017)"
+       ]
+      }
+     ]
+    },
+    {
+     "subject": "trib",
+     "label": "Dir. Tributário, Proc. Tributário e Dir. Financeiro",
+     "topics": [
+      {
+       "num": 10,
+       "title": "Processo Administrativo Tributário Municipal",
+       "subs": [
+        "lançamento e revisão administrativa",
+        "Impugnação, recursos e consulta tributária",
+        "Processo Administrativo Fiscal no Município de Curitiba",
+        "Constituição definitiva do crédito tributário",
+        "Controle administrativo da legalidade do lançamento"
+       ]
+      }
+     ]
+    },
+    {
+     "subject": "civil",
+     "label": "Direito Civil (foco discursiva)",
+     "topics": [
+      {
+       "num": 5,
+       "title": "Direito de Família",
+       "subs": [
+        "casamento, união estável e relações de parentesco. Regimes de bens",
+        "Dissolução da sociedade e do vínculo conjugal. Bem de família",
+        "Aspectos patrimoniais das relações familiares"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "2026-11-16",
+   "w": "Monday",
+   "d": 16,
+   "mo": "Nov",
+   "blocks": [
+    {
+     "subject": "adm",
+     "label": "Direito Administrativo",
+     "topics": [
+      {
+       "num": 11,
+       "title": "Poder de Polícia e Intervenção do Estado",
+       "subs": [
+        "Poder de polícia: conceito, atributos, limites, fases e delegação",
+        "Liberdade econômica e limites à intervenção estatal na atividade econômica (Lei Federal nº 13.874/2019)"
+       ]
+      }
+     ]
+    },
+    {
+     "subject": "cons",
+     "label": "Direito Constitucional",
+     "topics": [
+      {
+       "num": 8,
+       "title": "Administração Pública e Servidores",
+       "subs": [
+        "Princípios constitucionais da Administração Pública",
+        "Regime constitucional dos servidores públicos civis",
+        "Teto e subteto remuneratório constitucional"
+       ]
+      }
+     ]
+    },
+    {
+     "subject": "urb",
+     "label": "Direito Urbanístico e Ambiental",
+     "topics": [
+      {
+       "num": 5,
+       "title": "Regularização Fundiária Urbanística (REBURB)",
+       "subs": [
+        "Legislação federal (Lei nº 13.465/2017) e instrumentos de REBURB-S e REBURB-E aplicados ao contexto municipal. Decreto nº 390, de 23/03/2026, que regulamenta a Reurb em Curitiba",
+        "Usucapião especial urbana"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "2026-11-17",
+   "w": "Tuesday",
+   "d": 17,
+   "mo": "Nov",
+   "blocks": [
+    {
+     "subject": "review",
+     "focus": "Dir. Tributário, Proc. Tributário e Dir. Financeiro",
+     "label": "Reforço & questões — Dir. Tributário, Proc. Tributário e Dir. Financeiro",
+     "topics": []
+    },
+    {
+     "subject": "review",
+     "focus": "Direito Processual Civil",
+     "label": "Reforço & questões — Direito Processual Civil",
+     "topics": []
+    },
+    {
+     "subject": "trab",
+     "label": "Dir. do Trabalho e Processual do Trabalho",
+     "topics": [
+      {
+       "num": 8,
+       "title": "Execução no direito do trabalho",
+       "subs": []
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "2026-11-18",
+   "w": "Wednesday",
+   "d": 18,
+   "mo": "Nov",
+   "blocks": [
+    {
+     "subject": "review",
+     "focus": "Direito Administrativo",
+     "label": "Reforço & questões — Direito Administrativo",
+     "topics": []
+    },
+    {
+     "subject": "review",
+     "focus": "Direito Constitucional",
+     "label": "Reforço & questões — Direito Constitucional",
+     "topics": []
+    },
+    {
+     "subject": "prev",
+     "label": "Direito Previdenciário",
+     "topics": [
+      {
+       "num": 5,
+       "title": "Benefícios do RPPS Municipal",
+       "subs": [
+        "Aposentadoria voluntária, por incapacidade permanente (invalidez) e compulsória",
+        "Aposentadorias especiais (professores, pessoas com deficiência e agentes expostos a agentes nocivos)",
+        "Pensão por morte, dependentes, regras de cálculo, reajuste, paridade e integralidade. Abono de permanência",
+        "Acumulação de benefícios e limites constitucionais e legais"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "2026-11-19",
+   "w": "Thursday",
+   "d": 19,
+   "mo": "Nov",
+   "blocks": [
+    {
+     "subject": "trib",
+     "label": "Dir. Tributário, Proc. Tributário e Dir. Financeiro",
+     "topics": [
+      {
+       "num": 11,
+       "title": "Processo Judicial Tributário",
+       "subs": [
+        "execução fiscal (Lei Federal nº 6.830/1980)",
+        "Embargos à execução fiscal",
+        "Exceção de pré-executividade. Cautelar fiscal. Garantias da execução",
+        "Penhora e ordem de preferência",
+        "Redirecionamento da execução fiscal",
+        "Prescrição intercorrente. Ação anulatória. Ação declaratória. Repetição de indébito",
+        "Consignação em pagamento",
+        "Mandado de segurança em matéria tributária",
+        "Ação declaratória da inexistência de relação jurídico- tributária",
+        "Ação anulatória de débito fiscal"
+       ]
+      }
+     ]
+    },
+    {
+     "subject": "pproc",
+     "label": "Direito Processual Civil",
+     "topics": [
+      {
+       "num": 10,
+       "title": "Intervenção do Poder Público e Tutelas de Urgência",
+       "subs": [
+        "Intervenção das pessoas jurídicas de direito público em processos judiciais e pagamentos devidos pela Fazenda Pública, nos termos da Lei Federal nº 9.469/1997",
+        "Tutelas de urgência contra o Poder Público",
+        "Pedido de suspensão de liminar, de tutela provisória e de sentença. Lei Federal nº 8.437/1992 e Lei Federal nº 12.016/2009"
+       ]
+      }
+     ]
+    },
+    {
+     "subject": "pen",
+     "label": "Dir. Penal e Processual Penal",
+     "topics": [
+      {
+       "num": 2,
+       "title": "Persecução penal e a atuação da Administração Pública e da Advocacia Pública",
+       "subs": [
+        "Crimes praticados contra a Administração Municipal",
+        "Responsabilização penal de agentes públicos",
+        "Comunicação de ilícitos às autoridades competentes",
+        "Independência e interação entre as esferas administrativa, civil e penal",
+        "Crimes relacionados a licitações e contratos administrativos",
+        "Crimes contra o patrimônio e os serviços públicos municipais",
+        "Atuação do Município como interessado, vítima, assistente de acusação ou responsável civil, conforme a hipótese",
+        "Reparação do dano decorrente de ilícito penal",
+        "Preservação e utilização de elementos probatórios produzidos em procedimentos administrativos"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "2026-11-20",
+   "w": "Friday",
+   "d": 20,
+   "mo": "Nov",
+   "blocks": [
+    {
+     "subject": "adm",
+     "label": "Direito Administrativo",
+     "topics": [
+      {
+       "num": 12,
+       "title": "Intervenção estatal na propriedade privada",
+       "subs": [
+        "limitação administrativa, tombamento, servidão administrativa, requisição e ocupação temporária",
+        "Desapropriação por utilidade pública e interesse social: procedimento administrativo e judicial, indenização e desapropriação indireta"
+       ]
+      }
+     ]
+    },
+    {
+     "subject": "pproc",
+     "label": "Direito Processual Civil",
+     "topics": [
+      {
+       "num": 11,
+       "title": "Ações Constitucionais envolvendo o Poder Público",
+       "subs": [
+        "Habeas Data (Lei Federal nº 9.507/1997)",
+        "Mandado de Injunção individual e coletivo (Lei Federal nº 13.300/2016)",
+        "Mandado de Segurança individual e coletivo (Lei Federal nº 12.016/2009)",
+        "Ação Popular (Lei Federal nº 4.717/1965)"
+       ]
+      }
+     ]
+    },
+    {
+     "subject": "civil",
+     "label": "Direito Civil (foco discursiva)",
+     "topics": [
+      {
+       "num": 6,
+       "title": "Direito Sucessório",
+       "subs": [
+        "abertura da sucessão",
+        "Sucessão legítima e testamentária",
+        "Herança e administração da herança",
+        "Ordem de vocação hereditária. Herdeiros necessários",
+        "Direito de representação",
+        "Aceitação e renúncia da herança",
+        "Inventário, partilha e arrolamento",
+        "Pagamento das dívidas do espólio",
+        "Herança jacente e herança vacante",
+        "Arrecadação dos bens e destinação ao Poder Público"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "2026-11-23",
+   "w": "Monday",
+   "d": 23,
+   "mo": "Nov",
+   "blocks": [
+    {
+     "subject": "review",
+     "focus": "Direito Administrativo",
+     "label": "Reforço & questões — Direito Administrativo",
+     "topics": []
+    },
+    {
+     "subject": "cons",
+     "label": "Direito Constitucional",
+     "topics": [
+      {
+       "num": 9,
+       "title": "Tributação, Finanças e Ordem Econômica",
+       "subs": [
+        "Sistema Tributário Nacional na Constituição",
+        "Princípios e limitações do poder de tributar",
+        "Competências tributárias",
+        "Impostos da União, dos Estados, do Distrito Federal e dos Municípios",
+        "Transição e diretrizes constitucionais da Reforma Tributária (Emenda Constitucional nº 132/2023): Imposto sobre Bens e Serviços (IBS), Imposto Seletivo (IS), Comitê Gestor do IBS e regras de transição federativas",
+        "Repartição das receitas tributárias",
+        "Regime constitucional dos precatórios após as Emendas Constitucionais nº 113/2021 e nº 114/2021"
+       ]
+      }
+     ]
+    },
+    {
+     "subject": "urb",
+     "label": "Direito Urbanístico e Ambiental",
+     "topics": [
+      {
+       "num": 6,
+       "title": "Proteção e Tutela da Ordem Urbanística",
+       "subs": [
+        "Poder de polícia urbanístico, licenciamento, fiscalização e sanções",
+        "Controle jurisdicional e extrajudicial (Ação Civil Pública, Ação Popular e Termos de Ajustamento de Conduta)"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "2026-11-24",
+   "w": "Tuesday",
+   "d": 24,
+   "mo": "Nov",
+   "blocks": [
+    {
+     "subject": "trib",
+     "label": "Dir. Tributário, Proc. Tributário e Dir. Financeiro",
+     "topics": [
+      {
+       "num": 12,
+       "title": "Transação Tributária e Dívida Ativa do Município de Curitiba",
+       "subs": [
+        "Solução consensual de controvérsias tributárias e não tributárias",
+        "Transação de débitos inscritos em dívida ativa",
+        "Critérios de recuperabilidade. Transação individual",
+        "Pagamento, parcelamento e reparcelamento",
+        "Extinção de créditos tributários e não tributários. Lei Complementar Municipal nº 141/2023 e Decretos Municipais nº 2.305/2023 e nº 2.306/2023"
+       ]
+      }
+     ]
+    },
+    {
+     "subject": "review",
+     "focus": "Direito Processual Civil",
+     "label": "Reforço & questões — Direito Processual Civil",
+     "topics": []
+    },
+    {
+     "subject": "trab",
+     "label": "Dir. do Trabalho e Processual do Trabalho",
+     "topics": [
+      {
+       "num": 9,
+       "title": "Incidente de desconsideração da personalidade jurídica",
+       "subs": []
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "2026-11-25",
+   "w": "Wednesday",
+   "d": 25,
+   "mo": "Nov",
+   "blocks": [
+    {
+     "subject": "adm",
+     "label": "Direito Administrativo",
+     "topics": [
+      {
+       "num": 13,
+       "title": "Agentes Públicos",
+       "subs": [
+        "Cargo, emprego e função pública. Regime constitucional. Regime de provimento",
+        "Exigência constitucional de concurso público para investidura em cargo ou emprego público. Lei Municipal nº 16.639/2025 e Decreto nº 1.292/2026",
+        "Estatuto dos Funcionários Públicos do Município de Curitiba (Lei Municipal nº 1.656/1958 e alterações): direitos, deveres, proibições, regime disciplinar e processo administrativo disciplinar (PAD)",
+        "Decreto Municipal nº 868/2024"
+       ]
+      }
+     ]
+    },
+    {
+     "subject": "cons",
+     "label": "Direito Constitucional",
+     "topics": [
+      {
+       "num": 10,
+       "title": "Ordem econômica e financeira",
+       "subs": [
+        "princípios gerais, política urbana, agrícola, fundiária, reforma agrária e função social da propriedade",
+        "Intervenção do Estado no domínio econômico"
+       ]
+      }
+     ]
+    },
+    {
+     "subject": "prev",
+     "label": "Direito Previdenciário",
+     "topics": [
+      {
+       "num": 6,
+       "title": "Contribuição previdenciária dos servidores ativos, inativos, pensionistas e alíquota patronal do Mun",
+       "subs": []
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "2026-11-26",
+   "w": "Thursday",
+   "d": 26,
+   "mo": "Nov",
+   "blocks": [
+    {
+     "subject": "review",
+     "focus": "Dir. Tributário, Proc. Tributário e Dir. Financeiro",
+     "label": "Reforço & questões — Dir. Tributário, Proc. Tributário e Dir. Financeiro",
+     "topics": []
+    },
+    {
+     "subject": "pproc",
+     "label": "Direito Processual Civil",
+     "topics": [
+      {
+       "num": 12,
+       "title": "Ações Especiais e Coletivas envolvendo a Fazenda Pública",
+       "subs": [
+        "Ação monitória, inclusive contra a Fazenda Pública, e ação reivindicatória ajuizada pela Fazenda Pública (Lei Federal nº 13.105/2015 – Código de Processo Civil)",
+        "Ação Civil Pública (Lei Federal nº 7.347/1985)"
+       ]
+      }
+     ]
+    },
+    {
+     "subject": "emp",
+     "label": "Direito Empresarial",
+     "topics": [
+      {
+       "num": 4,
+       "title": "Falência e Recuperação de Empresas",
+       "subs": [
+        "Lei Federal nº 11.101/2005, com as alterações da Lei Federal nº 14.112/2020",
+        "Recuperação judicial e extrajudicial: legitimidade, requisitos, processamento, plano de recuperação, suspensão das execuções, administrador judicial, comitê e assembleia geral de credores, verificação e habilitação de créditos",
+        "Tratamento dos créditos tributários e demais créditos públicos",
+        "Falência: legitimidade, decretação, efeitos sobre o devedor, sócios, administradores, credores e contratos, arrecadação e realização do ativo, restituição, atos ineficazes e revogáveis, classificação e pagamento dos créditos",
+        "Convolação da recuperação judicial em falência",
+        "Relações entre recuperação judicial, falência, execução fiscal e créditos da Fazenda Pública"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "2026-11-27",
+   "w": "Friday",
+   "d": 27,
+   "mo": "Nov",
+   "blocks": [
+    {
+     "subject": "adm",
+     "label": "Direito Administrativo",
+     "topics": [
+      {
+       "num": 14,
+       "title": "Responsabilidade Civil do Estado",
+       "subs": [
+        "evolução histórica e fundamentos jurídicos",
+        "Teorias subjetivas e objetivas da responsabilidade patrimonial do Estado",
+        "Responsabilidade do Estado por atos (comissivos ou omissivos) da administração pública no direito brasileiro. Ação de regresso"
+       ]
+      }
+     ]
+    },
+    {
+     "subject": "trib",
+     "label": "Dir. Tributário, Proc. Tributário e Dir. Financeiro",
+     "topics": [
+      {
+       "num": 13,
+       "title": "Repartição Constitucional das Receitas Tributárias",
+       "subs": [
+        "repartição direta e indireta",
+        "Participação dos Municípios na arrecadação tributária. Fundos constitucionais",
+        "Repartição de receitas no novo sistema do IBS. Federalismo fiscal"
+       ]
+      }
+     ]
+    },
+    {
+     "subject": "civil",
+     "label": "Direito Civil (foco discursiva)",
+     "topics": [
+      {
+       "num": 7,
+       "title": "Registros Públicos (Lei nº 6.015/1973)",
+       "subs": [
+        "Registros, presunção de fé pública, prioridade, especialidade, legalidade, continuidade, transcrição, inscrição e averbação. Procedimento de dúvida"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "2026-11-30",
+   "w": "Monday",
+   "d": 30,
+   "mo": "Nov",
+   "blocks": [
+    {
+     "subject": "review",
+     "focus": "Direito Administrativo",
+     "label": "Reforço & questões — Direito Administrativo",
+     "topics": []
+    },
+    {
+     "subject": "review",
+     "focus": "Direito Constitucional",
+     "label": "Reforço & questões — Direito Constitucional",
+     "topics": []
+    },
+    {
+     "subject": "urb",
+     "label": "Direito Urbanístico e Ambiental",
+     "topics": [
+      {
+       "num": 7,
+       "title": "Proteção do Patrimônio Cultural.",
+       "subs": [
+        "Tutela de bens culturais materiais e imateriais",
+        "Lei Municipal nº 14.794/2016 (Dispõe sobre a proteção do Patrimônio Cultural do Município de Curitiba) e Decreto nº 360/2019 (Dispõe sobre os procedimentos administrativos para os processos relativos a Inventários, Tombamentos e Registros do conjunto de bens de natureza material e imaterial, que compõe o patrimônio cultural do Município de Curitiba)",
+        "Fundamentos e Princípios do Direito Ambiental: Artigo 225 da Constituição Federal",
+        "Princípios constitucionais e gerais do Direito Ambiental (prevenção, precaução, poluidor-pagador, usuário-pagador, cooperação, informação e participação)",
+        "Conceito jurídico de meio ambiente e seus aspectos (natural, artificial, cultural e do trabalho)",
+        "Política Nacional do Meio Ambiente (PNMA) e SISNAMA: Lei Federal nº 6.938/1981 e Regulamentação",
+        "Instrumentos de proteção ambiental",
+        "Licenciamento ambiental e avaliação de impacto ambiental (EIA/RIMA)",
+        "Resoluções CONAMA nº 01/1986, nº 237/1997 e nº 378/2006",
+        "Repartição de competências materiais e legislativas ambientais (Lei Complementar nº 140/2011). Recursos hídricos. Lei nº 9.433/1997 e suas alterações (Política Nacional de Recursos Hídricos)"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "2026-12-01",
+   "w": "Tuesday",
+   "d": 1,
+   "mo": "Dec",
+   "blocks": [
+    {
+     "subject": "trib",
+     "label": "Dir. Tributário, Proc. Tributário e Dir. Financeiro",
+     "topics": [
+      {
+       "num": 14,
+       "title": "Direito Financeiro e Orçamento Público",
+       "subs": [
+        "conceito, objeto e disciplina constitucional do Direito Financeiro",
+        "Atividade financeira do Estado. Lei Federal nº 4.320/1964",
+        "Planejamento e orçamento público: princípios orçamentários, Plano Plurianual – PPA, Lei de Diretrizes Orçamentárias – LDO e Lei Orçamentária Anual – LOA. Créditos adicionais",
+        "Execução orçamentária e programação financeira",
+        "Receita pública: conceito, classificação, receitas tributárias e não tributárias, alienação de bens e vinculação de receitas",
+        "Despesa pública: conceito, classificação, estágios, restos a pagar e despesas de exercícios anteriores",
+        "Fundos especiais: instituição e funcionamento. Gestão patrimonial. Crédito público",
+        "Dívida pública: conceito, classificação, disciplina jurídica e processamento"
+       ]
+      }
+     ]
+    },
+    {
+     "subject": "pproc",
+     "label": "Direito Processual Civil",
+     "topics": [
+      {
+       "num": 13,
+       "title": "Processos Estruturais e Controle Judicial de Políticas Públicas",
+       "subs": [
+        "conceito de litígios estruturais e o papel do Poder Judiciário na implementação de decisões estruturantes; medidas indutivas, coercitivas, mandamentais e sub- rogatórias (art. 139, IV, e art",
+        "536, § 1º, do CPC); fases de cognição e de implementação; flexibilização procedimental, audiências públicas e cooperação institucional na execução da decisão; controle judicial de políticas públicas e o princípio da reserva do possível",
+        "Protocolo para julgamento com perspectiva de gênero e raça",
+        "Resolução CNJ nº 492/2023",
+        "Resolução CNJ nº 598/2024"
+       ]
+      }
+     ]
+    },
+    {
+     "subject": "trab",
+     "label": "Dir. do Trabalho e Processual do Trabalho",
+     "topics": [
+      {
+       "num": 10,
+       "title": "Ação rescisória na justiça do trabalho",
+       "subs": []
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "2026-12-02",
+   "w": "Wednesday",
+   "d": 2,
+   "mo": "Dec",
+   "blocks": [
+    {
+     "subject": "adm",
+     "label": "Direito Administrativo",
+     "topics": [
+      {
+       "num": 15,
+       "title": "Improbidade Administrativa (Lei Federal nº 8.429/1992 com as alterações da Lei nº 14.230/2021) e Res",
+       "subs": [
+        "ponsabilidade dos Prefeitos (Decreto-Lei nº 201/1967). Lei Anticorrupção (Lei Federal nº 12.846/2013)",
+        "Decreto Municipal nº 1.671, de 12 de dezembro de 2019, que regulamenta, no âmbito do Poder Executivo Municipal, a responsabilização administrativa de pessoas jurídicas pela prática de atos contra a Administração Pública Municipal e dá outras providências"
+       ]
+      }
+     ]
+    },
+    {
+     "subject": "cons",
+     "label": "Direito Constitucional",
+     "topics": [
+      {
+       "num": 11,
+       "title": "Ordem Social, Seguridade Social, Saúde, Previdência Social, Assistência Social",
+       "subs": [
+        "Sistema Único. Lei Orgânica (Lei Federal nº 8.742/1993 e alterações legislativas posteriores). Sistema Único de Saúde",
+        "Lei nº 8.080/1990 e alterações legislativas posteriores; Lei nº 8.142/1990, política de dispensação de medicamentos, responsabilidade dos entes da Federação pela dispensação de medicamentos"
+       ]
+      }
+     ]
+    },
+    {
+     "subject": "prev",
+     "label": "Direito Previdenciário",
+     "topics": [
+      {
+       "num": 7,
+       "title": "Previdência Complementar no Município de Curitiba",
+       "subs": [
+        "Regime de Previdência Complementar (RPC) no âmbito municipal (art",
+        "40, §§ 14 a 16 da CF/88 e Lei Federal nº 12.618/2012); Curitiba Prev (Fundação de Previdência Complementar do Município de Curitiba - Lei Municipal nº 15.072/2017): estrutura, adesão, planos de benefícios e custeio"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "2026-12-03",
+   "w": "Thursday",
+   "d": 3,
+   "mo": "Dec",
+   "blocks": [
+    {
+     "subject": "review",
+     "focus": "Dir. Tributário, Proc. Tributário e Dir. Financeiro",
+     "label": "Reforço & questões — Dir. Tributário, Proc. Tributário e Dir. Financeiro",
+     "topics": []
+    },
+    {
+     "subject": "review",
+     "focus": "Direito Processual Civil",
+     "label": "Reforço & questões — Direito Processual Civil",
+     "topics": []
+    },
+    {
+     "subject": "review",
+     "focus": "Dir. Penal e Processual Penal",
+     "label": "Reforço & questões — Dir. Penal e Processual Penal",
+     "topics": []
+    }
+   ]
+  },
+  {
+   "id": "2026-12-04",
+   "w": "Friday",
+   "d": 4,
+   "mo": "Dec",
+   "blocks": [
+    {
+     "subject": "adm",
+     "label": "Direito Administrativo",
+     "topics": [
+      {
+       "num": 16,
+       "title": "Controle da Administração Pública",
+       "subs": [
+        "formas e tipos de controle (administrativo, legislativo e jurisdicional; interno e externo; prévio, concomitante e posterior). Lei de Acesso à Informação (Lei Federal nº 12.527/2011)",
+        "Controle exercido pelo Tribunal de Contas do Estado do Paraná (Lei Complementar nº 113, de 2005, Prejulgados e Súmulas)",
+        "Controle interno da Administração Municipal: Lei Municipal nº 16.268/2023, que dispõe sobre a Controladoria-Geral do Município de Curitiba e sobre a Política Municipal de Governança da Administração Direta, Autárquica e Fundacional",
+        "Decreto Municipal nº 1.055/2026 que Institui o Código de Ética e Conduta dos Agentes Públicos do Poder Executivo Municipal e dá outras providências"
+       ]
+      }
+     ]
+    },
+    {
+     "subject": "pproc",
+     "label": "Direito Processual Civil",
+     "topics": [
+      {
+       "num": 14,
+       "title": "Autocomposição e solução consensual de controvérsias na Administração Municipal de Curitiba",
+       "subs": [
+        "meios alternativos de solução de litígios judiciais e extrajudiciais; transação e autocomposição de conflitos no âmbito da Administração Pública Municipal; competência e atuação da Procuradoria-Geral do Município; transações judiciais; hipóteses de dispensa de propositura de ações, apresentação de defesas, impugnações, interposição de recursos e participação em audiências",
+        "Lei Complementar Municipal nº 141/2023 e Decreto Municipal nº 1.106/2024"
+       ]
+      }
+     ]
+    },
+    {
+     "subject": "civil",
+     "label": "Direito Civil (foco discursiva)",
+     "topics": [
+      {
+       "num": 8,
+       "title": "Locações de imóveis urbanos (Lei nº 8.245/1991)",
+       "subs": [
+        "Disposições gerais, locação em geral, sublocações, aluguel, deveres do locador e do locatário, direito de preferência, benfeitorias, garantias locatícias, penalidades civis, nulidades, locação residencial, locação para temporada, locação não residencial",
+        "Direitos autorais"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "2026-12-07",
+   "w": "Monday",
+   "d": 7,
+   "mo": "Dec",
+   "blocks": [
+    {
+     "subject": "review",
+     "focus": "Direito Administrativo",
+     "label": "Reforço & questões — Direito Administrativo",
+     "topics": []
+    },
+    {
+     "subject": "cons",
+     "label": "Direito Constitucional",
+     "topics": [
+      {
+       "num": 12,
+       "title": "Educação, Cultura e Desporto.",
+       "subs": [
+        "Ciência e Tecnologia. Comunicação Social. Meio Ambiente",
+        "Família, Criança, Adolescente e Pessoa Idosa. Povos indigenas"
+       ]
+      }
+     ]
+    },
+    {
+     "subject": "review",
+     "focus": "Direito Urbanístico e Ambiental",
+     "label": "Reforço & questões — Direito Urbanístico e Ambiental",
+     "topics": []
+    }
+   ]
+  },
+  {
+   "id": "2026-12-08",
+   "w": "Tuesday",
+   "d": 8,
+   "mo": "Dec",
+   "blocks": [
+    {
+     "subject": "trib",
+     "label": "Dir. Tributário, Proc. Tributário e Dir. Financeiro",
+     "topics": [
+      {
+       "num": 15,
+       "title": "Responsabilidade Fiscal",
+       "subs": [
+        "Lei Complementar Federal nº 101/2000",
+        "Responsabilidade na gestão fiscal, planejamento, transparência e equilíbrio das contas públicas. Metas fiscais. Renúncia de receita",
+        "Geração de despesa e despesas obrigatórias. Despesa com pessoal",
+        "Limitação de empenho e movimentação financeira",
+        "Transferências voluntárias. Dívida e endividamento. Operações de crédito",
+        "Concessão de garantias e contragarantias. Restos a pagar. Gestão patrimonial",
+        "Controle e fiscalização da gestão fiscal. Lei Complementar Municipal nº 101/2017"
+       ]
+      }
+     ]
+    },
+    {
+     "subject": "pproc",
+     "label": "Direito Processual Civil",
+     "topics": [
+      {
+       "num": 15,
+       "title": "Da prática eletrônica dos atos processuais e Lei nº 11.419/2006",
+       "subs": []
+      }
+     ]
+    },
+    {
+     "subject": "trab",
+     "label": "Dir. do Trabalho e Processual do Trabalho",
+     "topics": [
+      {
+       "num": 11,
+       "title": "Tutela coletiva e difusa.",
+       "subs": []
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "2026-12-09",
+   "w": "Wednesday",
+   "d": 9,
+   "mo": "Dec",
+   "blocks": [
+    {
+     "subject": "adm",
+     "label": "Direito Administrativo",
+     "topics": [
+      {
+       "num": 17,
+       "title": "Transformação Digital, Proteção de Dados e Inteligência Artificial na Administração Pública",
+       "subs": [
+        "Lei Geral de Proteção de Dados Pessoais (Lei Federal nº 13.709/2018) e sua aplicação à Administração Pública",
+        "Governo Digital (Lei Federal nº 14.129/2021)",
+        "Marco Legal de Ciência, Tecnologia e Inovação (Lei Federal nº 10.973/2004, com as alterações da Lei Federal nº 13.243/2016)",
+        "Lei Municipal nº 16.321/2024, que estabelece princípios e diretrizes para a implementação e o uso da inteligência artificial no âmbito da Administração Pública Municipal direta e indireta"
+       ]
+      }
+     ]
+    },
+    {
+     "subject": "review",
+     "focus": "Direito Constitucional",
+     "label": "Reforço & questões — Direito Constitucional",
+     "topics": []
+    },
+    {
+     "subject": "review",
+     "focus": "Direito Previdenciário",
+     "label": "Reforço & questões — Direito Previdenciário",
+     "topics": []
+    }
+   ]
+  },
+  {
+   "id": "2026-12-10",
+   "w": "Thursday",
+   "d": 10,
+   "mo": "Dec",
+   "blocks": [
+    {
+     "subject": "trib",
+     "label": "Dir. Tributário, Proc. Tributário e Dir. Financeiro",
+     "topics": [
+      {
+       "num": 16,
+       "title": "Precatórios e Requisições de Pequeno Valor",
+       "subs": [
+        "regime constitucional de precatórios e obrigações de pequeno valor",
+        "Ordem cronológica, preferências, cessão, acordos, compensação e pagamento",
+        "Limites aplicáveis aos Estados, Distrito Federal e Municípios",
+        "Regime aplicável ao Município de Curitiba. Lei Municipal nº 10.235/2001 e alterações",
+        "Emendas constitucionais vigentes sobre precatórios, especialmente a Emenda Constitucional nº 136/2025"
+       ]
+      }
+     ]
+    },
+    {
+     "subject": "review",
+     "focus": "Direito Processual Civil",
+     "label": "Reforço & questões — Direito Processual Civil",
+     "topics": []
+    },
+    {
+     "subject": "emp",
+     "label": "Direito Empresarial",
+     "topics": [
+      {
+       "num": 5,
+       "title": "Propriedade industrial.",
+       "subs": [
+        "Lei nº 9.279/1996 (direitos e obrigações relativos à propriedade industrial)",
+        "Instituto Nacional da Propriedade Industrial (INPI)",
+        "Propriedade industrial e direitos autorais. Desenho industrial. Marca: espécies",
+        "Procedimento de registro. Indicações geográficas",
+        "JURISPRUDÊNCIA E PRECEDENTES QUALIFICADOS: Integram o conteúdo programático os entendimentos jurisprudenciais pertinentes às matérias previstas neste Edital compreendendo Súmulas e Súmulas Vinculantes, temas de repercussão geral do Supremo Tribunal Federal, recursos extraordinário e especial repetitivos, incidentes de resolução de demandas repetitivas (IRDR), incidentes de assunção de competência (IAC) e demais precedentes qualificados, considerados os precedentes, súmulas e teses fixados ou publicados até a data de publicação deste Edital"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "2026-12-11",
+   "w": "Friday",
+   "d": 11,
+   "mo": "Dec",
+   "blocks": [
+    {
+     "subject": "review",
+     "focus": "Direito Administrativo",
+     "label": "Reforço & questões — Direito Administrativo",
+     "topics": []
+    },
+    {
+     "subject": "review",
+     "focus": "Dir. Tributário, Proc. Tributário e Dir. Financeiro",
+     "label": "Reforço & questões — Dir. Tributário, Proc. Tributário e Dir. Financeiro",
+     "topics": []
+    },
+    {
+     "subject": "review",
+     "focus": "Direito Civil (foco discursiva)",
+     "label": "Reforço & questões — Direito Civil (foco discursiva)",
+     "topics": []
+    }
+   ]
+  }
+ ]
+};
+</script>
+<script>
+const D = window.PGM_DATA;
+const WD = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+const MO = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+const KEY = 'pgm-ck-v1';
+let S = {}; try { S = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch(e){ S = {}; }
+const TOTAL = D.days.length * 3;
+const todayISO = (() => { const t = new Date(); return `${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getDate()).padStart(2,'0')}`; })();
+const COLORS = {adm:'--adm',cons:'--cons',trib:'--trib',pproc:'--pproc',urb:'--urb',trab:'--trab',prev:'--prev',pen:'--pen',emp:'--emp',civil:'--civil',review:'--review'};
+
+function save(){ localStorage.setItem(KEY, JSON.stringify(S)); }
+
+function fmt(iso){ const [y,m,dd] = iso.split('-').map(Number); return `${dd} ${MO[m-1]}`; }
+
+function build(){
+  const app = document.getElementById('app');
+  let html = '', week = null, wi = 0;
+  D.days.forEach((day, idx) => {
+    const wnum = Math.floor(idx/5)+1;
+    if (wnum !== week){ week = wnum;
+      if (wnum > 1) html += '</div>';
+      const a = D.days[(wnum-1)*5], z = D.days[Math.min(wnum*5, D.days.length)-1];
+      html += `<section class="weekwrap" data-week="${wnum}"><div class="week"><h2>Semana ${wnum}</h2><small>${fmt(a.id)} – ${fmt(z.id)}</small><div class="wbar"><i></i></div><small class="wpct"></small></div><div class="grid">`;
+    }
+    const isToday = day.id === todayISO;
+    let cards = '';
+    day.blocks.forEach(b => {
+      const col = `var(${COLORS[b.subject] || '--mut'})`;
+      let inner;
+      if (b.subject === 'review'){
+        inner = `<div class="rev">${b.label} · revise o caderno de erros + 40 questões da matéria</div>`;
+      } else {
+        inner = b.topics.map(t => `
+          <details ${b.topics.length===1?'open':''}><summary>${t.num}. ${esc(t.title)}</summary>
+            <ul>${t.subs.map(s => `<li>${esc(s)}</li>`).join('')}</ul></details>`).join('');
+      }
+      cards += `<div class="blk" style="border-color:${col}">
+        <div class="subj" style="color:${col}">${D.subjects[b.subject]?.emoji || '🔄'} ${esc(b.label || (D.subjects[b.subject]||{}).label || '')}</div>${inner}</div>`;
+    });
+    const c = S[day.id] || {};
+    const nDone = (c.e?1:0)+(c.m?1:0)+(c.q?1:0);
+    html += `<article class="day${isToday?' today':''}${nDone===3?' done':''}" id="d-${day.id}" data-day="${day.id}">
+      <div class="dhead"><b>${WD[dayOfWeek(day.id)]}, ${day.id.slice(8,10)}/${day.id.slice(5,7)}</b>
+      ${isToday?'<span class="tt">HOJE</span>':nDone===3?'<span class="tt">✔ concluído</span>':''}</div>
+      ${cards}
+      <div class="chk">
+        <button data-k="e" class="${c.e?'on':''}">📚 Estudado</button>
+        <button data-k="m" class="${c.m?'on':''}">🧠 Memorizado</button>
+        <button data-k="q" class="${c.q?'on':''}">✍️ Questões</button>
+      </div>
+    </article>`;
+  });
+  html += '</div></section>';
+  html += `<div class="fin">🎯 <b>12/12 (sáb): leve — só seus mapas de revisão. · 13/12 (dom): PROVA OBJETIVA</b><br>
+  <small style="color:var(--mut)">Depois: Fase Discursiva (parecer + peça) — treino diário de 15/12 a 23/02. Bora, futuro(a) Procurador(a) do Município!</small></div>`;
+  app.innerHTML = html;
+}
+function dayOfWeek(iso){ const [y,m,d] = iso.split('-').map(Number); return new Date(y, m-1, d).getDay(); }
+function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function refresh(){
+  let n = 0, doneDays = 0;
+  D.days.forEach(day => {
+    const c = S[day.id] || {};
+    const k = (c.e?1:0)+(c.m?1:0)+(c.q?1:0);
+    n += k; if (k===3) doneDays++;
+    const el = document.getElementById('d-'+day.id);
+    if (el){ [...el.querySelectorAll('.chk button')].forEach(b => b.classList.toggle('on', !!c[b.dataset.k]));
+             el.classList.toggle('done', k===3); }
+  });
+  document.getElementById('pbar').style.width = (100*n/TOTAL) + '%';
+  document.getElementById('ptxt').textContent = `${n}/${TOTAL} check-ins (${Math.round(100*n/TOTAL)}%)`;
+  document.getElementById('pdays').textContent = `${doneDays}/${D.days.length} dias completos`;
+  document.querySelectorAll('.weekwrap').forEach(w => {
+    const wk = +w.dataset.week; let t = 0, dn = 0;
+    D.days.slice((wk-1)*5, wk*5).forEach(day => { const c = S[day.id]||{}; const k=(c.e?1:0)+(c.m?1:0)+(c.q?1:0); t+=k; if(k===3)dn++; });
+    w.querySelector('.wbar i').style.width = (100*t/(D.days.slice((wk-1)*5, wk*5).length*3)) + '%';
+    w.querySelector('.wpct').textContent = dn===D.days.slice((wk-1)*5, wk*5).length ? '✔ semana fechada' : `${t}/${D.days.slice((wk-1)*5, wk*5).length*3}`;
+  });
+}
+function countdown(){
+  const [y,m,d] = D.exam.split('-').map(Number);
+  const ms = new Date(y, m-1, d, 9, 0, 0) - new Date();
+  const days = Math.ceil(ms/864e5);
+  document.getElementById('countdown').textContent = days > 0 ? `⏳ ${days} dias p/ prova` : '🍀 Boa prova!';
+}
+document.addEventListener('click', ev => {
+  const b = ev.target.closest('.chk button'); if (!b) return;
+  const id = b.closest('.day').dataset.day, k = b.dataset.k;
+  S[id] = S[id] || {}; S[id][k] = !S[id][k];
+  if (!S[id].e && !S[id].m && !S[id].q) delete S[id];
+  save(); refresh();
+});
+function toggleAll(open){ document.querySelectorAll('.blk details').forEach(d => d.open = open); }
+function resetAll(){ if (confirm('Apagar TODO o progresso de check-ins?')){ S = {}; localStorage.removeItem(KEY); refresh(); } }
+function exportar(){
+  const payload = {app:'pgm-organizada', versao:1, exportado:new Date().toISOString(), origem:location.host, checkins:S};
+  const blob = new Blob([JSON.stringify(payload, null, 1)], {type:'application/json'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = 'pgm-progresso-' + todayISO + '.json'; a.click(); URL.revokeObjectURL(a.href);
+}
+document.getElementById('impf').addEventListener('change', ev => {
+  const f = ev.target.files[0]; if (!f) return;
+  const r = new FileReader();
+  r.onload = () => {
+    try {
+      const j = JSON.parse(r.result); const ck = j.checkins ?? j;
+      if (ck && typeof ck === 'object' && !Array.isArray(ck)) {
+        S = {...S, ...ck}; Object.keys(S).forEach(k => { if (!S[k] || !Object.keys(S[k]).length) delete S[k]; });
+        save(); refresh(); alert('Progresso importado ✔ ' + Object.keys(ck).length + ' dias fundidos aos atuais.');
+      } else alert('Arquivo inválido: sem campo "checkins".');
+    } catch(e){ alert('Erro ao ler JSON: ' + e.message); }
+    ev.target.value = '';
+  };
+  r.readAsText(f);
+});
+build(); refresh(); countdown();
+</script>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a49a7437d9a9e026',t:'MTc5MTg1MzcxNQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
